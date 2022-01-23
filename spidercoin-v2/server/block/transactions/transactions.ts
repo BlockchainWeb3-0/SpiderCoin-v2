@@ -13,7 +13,8 @@ export class Transaction {
 
 /**
  *
- * @param transaction
+ * @param transaction transaction
+ * @returns transaction's Id
  */
 const getTransactionId = (transaction: Transaction): string => {
     const txInContent: string = transaction.txIns
@@ -23,6 +24,32 @@ const getTransactionId = (transaction: Transaction): string => {
         .map((TxOut: TxOut) => TxOut.address + TxOut.amount)
         .reduce((a, b) => a + b, "");
     return CryptoJS.SHA256(txInContent + txOutContent).toString();
+};
+
+const findUnspentTxOut = (
+    transactionId: string,
+    index: number,
+    fUnspentTxOuts: UnspentTxOut[]
+): UnspentTxOut | undefined => {
+    return fUnspentTxOuts.find(
+        (uTxO) => uTxO.txOutId === transactionId && uTxO.txOutIndex === index
+    );
+};
+
+const signTxIn = (
+    transaction: Transaction,
+    txInIndex: number,
+    privateKey: string,
+    unSpentTxOuts: UnspentTxOut[]
+): string => {
+    const txIn: TxIn = transaction.txIns[txInIndex];
+    const dataToSign: string = transaction.id;
+    const referencedUnspentTxOut: UnspentTxOut | undefined = findUnspentTxOut(
+        transaction.id,
+        txInIndex,
+        unSpentTxOuts
+    );
+    return;
 };
 
 export { getTransactionId };
