@@ -3,7 +3,7 @@
  */
 
 import fs from "fs";
-import merkle from "merkle";
+import * as config from "../../config";
 
 /**
  * Block's header
@@ -44,13 +44,24 @@ export class BlockHeader {
         const version: string = JSON.parse(packagejson).version;
         return version;
     };
+
+    static adjustDifficulty(
+        lastBlockHeader: BlockHeader,
+        newBlockTime: number
+    ): number {
+        let difficulty: number = lastBlockHeader.difficulty;
+        const newBlockInterval: number =
+            newBlockTime - lastBlockHeader.timestamp;
+        if (
+            lastBlockHeader.index % config.BLOCK_GENERATION_INTERVAL === 0 &&
+            lastBlockHeader.index !== 0
+        ) {
+            if (newBlockInterval > config.MINE_INTERVAL * 2) {
+                return difficulty - 1;
+            } else if (newBlockInterval < config.MINE_INTERVAL / 2) {
+                return difficulty + 1;
+            }
+        }
+        return difficulty;
+    }
 }
-const newBlockHeader: BlockHeader = new BlockHeader(
-    BlockHeader.getVersion(),
-    1,
-    "0".repeat(64),
-    "0".repeat(64),
-    Date.now(),
-    1,
-    1
-);

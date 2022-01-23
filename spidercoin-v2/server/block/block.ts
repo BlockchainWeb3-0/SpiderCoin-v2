@@ -22,7 +22,7 @@ const genesisTransaction: Transaction = {
 /**
  * Block class
  */
-class Block {
+export class Block {
     public header: BlockHeader;
     public hash: string;
     public transaction: Transaction[];
@@ -35,23 +35,27 @@ class Block {
 
     /**
      *
-     * @param blockHeader - block's header
+     * @param blockHeader block's header
      * @returns this block's hash string
      */
     static calHashOfBlock = (blockHeader: BlockHeader): string => {
-        if (typeof blockHeader === "object") {
-            const blockString: string =
-                blockHeader.version +
-                blockHeader.index +
-                blockHeader.prevHash +
-                blockHeader.merkleRoot +
-                blockHeader.timestamp +
-                blockHeader.difficulty +
-                blockHeader.nonce;
-            const hash = CryptoJS.SHA256(blockString).toString();
-            return hash;
+        try {
+            if (typeof blockHeader === "object") {
+                const blockString: string =
+                    blockHeader.version +
+                    blockHeader.index +
+                    blockHeader.prevHash +
+                    blockHeader.merkleRoot +
+                    blockHeader.timestamp +
+                    blockHeader.difficulty +
+                    blockHeader.nonce;
+                const hash = CryptoJS.SHA256(blockString).toString();
+                return hash;
+            }
+            throw new Error("Invalid BlockHeader");
+        } catch (error) {
+            console.log(error);
         }
-        throw new Error("Invalid BlockHeader");
     };
 
     /**
@@ -59,23 +63,81 @@ class Block {
      * @returns get genesis block
      */
     static getGenesisBlock = (): Block => {
-        const transaction: Transaction[] = [genesisTransaction];
-        const header = new BlockHeader(
-            BlockHeader.getVersion(),
-            0,
-            "0".repeat(64),
-            merkle("sha256")
-                .sync([JSON.stringify(transaction)])
-                .root() || "0".repeat(64),
-            1631006505,
-            config.INITIAL_DIFFICULTY,
-            2083236893
-        );
-        const hash = this.calHashOfBlock(header);
-        if (!hash) {
-            throw new Error("Invalid Hash");
+        try {
+            const transaction: Transaction[] = [genesisTransaction];
+            const header = new BlockHeader(
+                BlockHeader.getVersion(),
+                0,
+                "0".repeat(64),
+                merkle("sha256")
+                    .sync([JSON.stringify(transaction)])
+                    .root() || "0".repeat(64),
+                1631006505,
+                config.INITIAL_DIFFICULTY,
+                2083236893
+            );
+            const hash = this.calHashOfBlock(header);
+            if (!hash) {
+                throw new Error("Invalid Hash");
+            }
+
+            const genesisBlock: Block = new Block(header, hash, transaction);
+            return genesisBlock;
+        } catch (error) {
+            console.log(error);
         }
-        const genesisBlock: Block = new Block(header, hash, transaction);
-        return genesisBlock;
+    };
+
+    /**
+     *
+     * @param lastBlock  chain's last block
+     * @param transaction block's transaction
+     * @returns 1 new Block
+     */
+    static mineNewBlock = (
+        lastBlock: Block,
+        transaction: Transaction[]
+    ): Block => {
+        try {
+            const version: string = BlockHeader.getVersion();
+            const index: number = lastBlock.header.index + 1;
+            const prevHash: string = lastBlock.hash;
+            let merkleRoot: string;
+            if (transaction.length) {
+                merkleRoot = merkle("sha256")
+                    .sync([JSON.stringify(transaction)])
+                    .root();
+            } else {
+                merkleRoot = "0".repeat(64);
+            }
+            console.log("mineNewBlock's merkleRoot", merkleRoot);
+            let timestamp: number;
+            const difficulty: number = BlockHeader.adjustDifficulty(
+                lastBlock.header,
+                timestamp
+            );
+            let nonce: number = 0;
+            let blockHeader: BlockHeader;
+            let hash: string;
+
+            do {
+                timestamp = Math.round(Date.now() / 1000);
+                blockHeader = new BlockHeader(
+                    version,
+                    index,
+                    prevHash,
+                    merkleRoot,
+                    timestamp,
+                    difficulty,
+                    nonce
+                );
+                hash = this.calHashOfBlock(blockHeader);
+                nonce++;
+            } while (!hash.startsWith("0".repeat(difficulty)));
+            const newBlock: Block = new Block(blockHeader, hash, transaction);
+            return newBlock;
+        } catch (error) {
+            console.log(error);
+        }
     };
 }
