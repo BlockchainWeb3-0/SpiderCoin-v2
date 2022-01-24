@@ -3,7 +3,7 @@
  * Transaction Output을 참조한다.
  * privatekey를 통해 signature가 들어간다.
  */
-interface TxIn {
+export interface TxIn {
     txOutId: string;
     txOutIndex: number;
     signature: string;

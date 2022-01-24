@@ -1,5 +1,9 @@
 import CryptoJS from "crypto-js";
 import ecdsa from "elliptic";
+import { TxOut } from "./txOut/txOut";
+import { TxIn } from "./txIn/txIn";
+import { UnspentTxOut } from "./unspentTxOut/unspentTxOut";
+import { toHexString } from "../../utils/utils";
 
 const ec = new ecdsa.ec("secp256k1");
 
@@ -26,6 +30,13 @@ const getTransactionId = (transaction: Transaction): string => {
     return CryptoJS.SHA256(txInContent + txOutContent).toString();
 };
 
+/**
+ *
+ * @param transactionId transaction's Id
+ * @param index transactions out's Index
+ * @param fUnspentTxOuts unspent transaction outputs
+ * @returns 1 unspent transaction
+ */
 const findUnspentTxOut = (
     transactionId: string,
     index: number,
@@ -42,14 +53,21 @@ const signTxIn = (
     privateKey: string,
     unSpentTxOuts: UnspentTxOut[]
 ): string => {
-    const txIn: TxIn = transaction.txIns[txInIndex];
-    const dataToSign: string = transaction.id;
-    const referencedUnspentTxOut: UnspentTxOut | undefined = findUnspentTxOut(
-        transaction.id,
-        txInIndex,
-        unSpentTxOuts
-    );
-    return;
+    try {
+        const txIn: TxIn = transaction.txIns[txInIndex];
+        const dataToSign: string = transaction.id;
+        const referencedUnspentTxOut: UnspentTxOut | undefined =
+            findUnspentTxOut(transaction.id, txInIndex, unSpentTxOuts);
+        if (referencedUnspentTxOut === undefined) {
+            throw new Error("Can't find transaction Id from UnspentTxOut");
+        }
+        const referencedAddress: string = referencedUnspentTxOut.address;
+        const key = ec.keyFromPrivate(privateKey, "hex");
+        const signature: string = toHexString(key.sign(dataToSign).toDER());
+        return signature;
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 export { getTransactionId };

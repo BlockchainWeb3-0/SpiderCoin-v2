@@ -68,4 +68,16 @@ const isValidNewBlock = (newBlock: Block, lastBlock: Block): boolean => {
     return true;
 };
 
-export { isValidBlockStructure, isValidNewBlock };
+/**
+ * 한자리 수도 두자리로 나타내기 위해 "0"을 더함.
+ * 두자리 수는 0을 더해서 세자리가 되므로 slice로 마지막 두 숫자만 반환
+ * @param byteArray
+ * @returns Hex data -> String data
+ */
+const toHexString = (byteArray: number[]): string => {
+    return Array.from(byteArray, (byte: any) =>
+        ("0" + (byte & 0xff).toString(16)).slice(-2)
+    ).join("");
+};
+
+export { isValidBlockStructure, isValidNewBlock, toHexString };

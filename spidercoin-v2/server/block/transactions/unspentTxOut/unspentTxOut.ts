@@ -1,4 +1,4 @@
-class UnspentTxOut {
+export class UnspentTxOut {
     public readonly txOutId: string;
     public readonly txOutIndex: number;
     public readonly address: string;
