@@ -1,3 +1,5 @@
+import { TxIn } from "../txIn";
+
 describe("transactionIn test", () => {
     beforeEach(() => {
         const data: TxIn = {

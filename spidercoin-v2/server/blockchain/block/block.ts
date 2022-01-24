@@ -2,7 +2,7 @@ import CryptoJS from "crypto-js";
 import merkle from "merkle";
 import { BlockHeader } from "./blockheader/blockheader";
 import { Transaction } from "./transactions/transactions";
-import * as config from "../config";
+import * as config from "../../config";
 
 /**
  * block's genesis transaction

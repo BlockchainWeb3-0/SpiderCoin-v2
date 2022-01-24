@@ -1,5 +1,5 @@
-import { Block } from "../block/block";
 import merkle from "merkle";
+import { Block } from "../blockchain/block/block";
 
 /**
  *

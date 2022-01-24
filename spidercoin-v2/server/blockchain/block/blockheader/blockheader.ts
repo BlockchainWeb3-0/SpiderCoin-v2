@@ -3,7 +3,7 @@
  */
 
 import fs from "fs";
-import * as config from "../../config";
+import * as config from "../../../config";
 
 /**
  * Block's header

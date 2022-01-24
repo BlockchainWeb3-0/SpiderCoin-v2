@@ -1,12 +1,10 @@
 import { ec } from "elliptic";
 import fs from "fs";
 import { getPrivateFromWallet } from "../../wallet/wallet";
-import { TxIn } from "../../block/transactions/txIn/txIn";
-import { TxOut } from "../../block/transactions/txOut/txOut";
-import {
-    Transaction,
-    TxFunctions,
-} from "../../block/transactions/transactions";
+import { TxIn } from "../block/transactions/txIn/txIn";
+
+import { Transaction, TxFunctions } from "../block/transactions/transactions";
+import { TxOut } from "../block/transactions/txOut/txOut";
 
 const testGetPublicFromWallet = (filename: string) => {
     const buffer = fs.readFileSync(`node/wallet/${filename}`, "utf8");

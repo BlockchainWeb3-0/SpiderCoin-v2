@@ -1,6 +1,6 @@
 import { BlockHeader } from "../blockheader";
 import merkle from "merkle";
-import * as config from "../../../config";
+import * as config from "../../../../config";
 
 export const genesisBlock: BlockHeader = new BlockHeader(
     BlockHeader.getVersion(),

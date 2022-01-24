@@ -1,4 +1,4 @@
-import { Transaction } from "./block/transactions/transactions";
+import { Transaction } from "./blockchain/block/transactions/transactions";
 
 export const INITIAL_DIFFICULTY: number = 3;
 

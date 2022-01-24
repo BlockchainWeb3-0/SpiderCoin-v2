@@ -1,6 +1,6 @@
 import { BlockHeader } from "../blockheader";
 import merkle from "merkle";
-import * as config from "../../../config";
+import * as config from "../../../../config";
 import { genesisBlock } from "./testGenesisBlock";
 
 describe("BlockHeader test", () => {
