@@ -2,7 +2,7 @@ import { Block } from "../block/block";
 import { Transaction } from "../block/transactions/transactions";
 import { isValidNewBlock } from "../utils/utils";
 
-export default class Blockchain {
+export class Blockchain {
     public chain: Block[];
 
     constructor() {

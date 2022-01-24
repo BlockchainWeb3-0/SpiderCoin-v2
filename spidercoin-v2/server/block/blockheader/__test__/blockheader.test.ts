@@ -1,23 +1,13 @@
 import { BlockHeader } from "../blockheader";
 import merkle from "merkle";
-import { Transaction } from "../../transactions/transactions";
 import * as config from "../../../config";
+import { genesisBlock } from "./testGenesisBlock";
 
 describe("BlockHeader test", () => {
     const genesisTransaction = config.GENESIS_TRANSACTION;
-    let genesisBlockHeader: BlockHeader, newBlockHeader: BlockHeader;
+    let genesisBlockHeader: BlockHeader;
     beforeEach(() => {
-        genesisBlockHeader = new BlockHeader(
-            BlockHeader.getVersion(),
-            0,
-            "0".repeat(64),
-            merkle("sha256")
-                .sync([JSON.stringify(genesisTransaction)])
-                .root() || "0".repeat(64),
-            1631006505,
-            config.INITIAL_DIFFICULTY,
-            2083236893
-        );
+        genesisBlockHeader = genesisBlock;
     });
 
     test("Genesis blockheader structure validation", () => {
@@ -57,6 +47,4 @@ describe("BlockHeader test", () => {
         const expectedDifficulty: number = config.INITIAL_DIFFICULTY;
         expect(difficulty).toBe(expectedDifficulty);
     });
-
-    test("check genesis header's merkleroot", () => {});
 });

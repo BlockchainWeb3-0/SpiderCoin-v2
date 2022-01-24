@@ -1,16 +1,24 @@
-import Blockchain from "../blockchain";
+import { Block } from "../../block/block";
 import merkle from "merkle";
 import { Transaction } from "../../block/transactions/transactions";
-
+import { Blockchain } from "../blockchain";
 import { testCreateTxs } from "./testCreateTxFunc";
+import { isValidNewBlock } from "../../utils/utils";
 
 describe("add block from genesis block test", () => {
-    const tx1: Transaction[] = testCreateTxs(10);
-    let blockchain = new Blockchain();
-    blockchain.addBlock(tx1);
-    const chain = blockchain.chain;
-    const prevBlock = chain[chain.length - 2];
-    const newBlock = chain[chain.length - 1];
+    let tx1: Transaction[], chain: Block[], prevBlock: Block, newBlock: Block;
+    beforeEach(() => {
+        let blockchain: Blockchain = new Blockchain();
+        tx1 = testCreateTxs(10);
+        blockchain.addBlock(tx1);
+        chain = blockchain.chain;
+        prevBlock = chain[chain.length - 2];
+        newBlock = chain[chain.length - 1];
+    });
+
+    test("check newBlock's structure", () => {
+        expect(isValidNewBlock(newBlock, prevBlock)).toBeTruthy();
+    });
 
     test("check newBlock's hash and genesisBlock's hash", () => {
         expect(newBlock.header.prevHash).toBe(prevBlock.hash);
@@ -25,22 +33,32 @@ describe("add block from genesis block test", () => {
         const newMerkleRoot: string = merkle("sha256")
             .sync([JSON.stringify(tx1)])
             .root();
-        console.log("in test", newMerkleRoot);
         expect(newBlock.header.merkleRoot).toBe(newMerkleRoot);
     });
 });
 
 describe("add block from new created block test", () => {
-    const tx1: Transaction[] = testCreateTxs(10);
-    const tx2: Transaction[] = testCreateTxs(30);
-    let blockchain = new Blockchain();
-    blockchain.addBlock(tx1);
-    setTimeout(() => {
-        blockchain.addBlock(tx2);
-    }, 1500);
-    const chain = blockchain.chain;
-    const prevBlock = chain[chain.length - 2];
-    const newBlock = chain[chain.length - 1];
+    let tx1: Transaction[],
+        tx2: Transaction[],
+        chain: Block[],
+        prevBlock: Block,
+        newBlock: Block;
+    beforeEach(() => {
+        let blockchain: Blockchain = new Blockchain();
+        tx1 = testCreateTxs(10);
+        tx2 = testCreateTxs(30);
+        blockchain.addBlock(tx1);
+        setTimeout(() => {
+            blockchain.addBlock(tx2);
+        }, 1500);
+        chain = blockchain.chain;
+        prevBlock = chain[chain.length - 2];
+        newBlock = chain[chain.length - 1];
+    });
+
+    test("check newBlock's structure", () => {
+        expect(isValidNewBlock(newBlock, prevBlock)).toBeTruthy();
+    });
 
     test("check newBlock's hash and prevBlock's hash", () => {
         expect(newBlock.header.prevHash).toBe(prevBlock.hash);
