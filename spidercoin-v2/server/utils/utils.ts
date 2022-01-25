@@ -7,6 +7,9 @@ import {
 import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
 import { TxOut } from "../blockchain/block/transactions/txOut/txOut";
 import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
+import * as ecdsa from "elliptic";
+
+const ec = new ecdsa.ec("secp256k1");
 
 /**
  *
@@ -171,6 +174,29 @@ const isValidTransactionStructure = (transaction: Transaction) => {
     }
 };
 
+const validateTxIn = (
+    txIn: TxIn,
+    transaction: Transaction,
+    unspentTxOuts: UnspentTxOut[]
+): boolean => {
+    const referencedUTxOut: UnspentTxOut = unspentTxOuts.find(
+        (uTxO) =>
+            uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex
+    );
+    if (referencedUTxOut == null) {
+        console.log("Referenced txOut not found");
+        return false;
+    }
+    const address: string = referencedUTxOut.address;
+    const key = ec.keyFromPublic(address, "hex");
+    const validSignature: boolean = key.verify(transaction.id, txIn.signature);
+    if (!validSignature) {
+        console.log("Invalid TxIn signature");
+        return false;
+    }
+    return true;
+};
+
 const validtateTransaction = (
     transaction: Transaction,
     unspentTxOuts: UnspentTxOut[]
@@ -182,6 +208,9 @@ const validtateTransaction = (
         console.log("Invalid txId");
         return false;
     }
+    const hasValidTxIns: boolean = transaction.txIns
+        .map((txIn) => validateTxIn(txIn, transaction, unspentTxOuts))
+        .reduce((a, b) => a && b, true);
 
     return true;
 };
