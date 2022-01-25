@@ -1,5 +1,12 @@
 import merkle from "merkle";
 import { Block } from "../blockchain/block/block";
+import {
+    Transaction,
+    TxFunctions,
+} from "../blockchain/block/transactions/transactions";
+import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
+import { TxOut } from "../blockchain/block/transactions/txOut/txOut";
+import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
 
 /**
  *
@@ -80,4 +87,108 @@ const toHexString = (byteArray: number[]): string => {
     ).join("");
 };
 
-export { isValidBlockStructure, isValidNewBlock, toHexString };
+const isValidAddress = (address: string): boolean => {
+    if (address.length !== 130) {
+        console.log("Invalid public key length");
+        return false;
+    } else if (address.match("^[a-fA-F0-9]+$") === null) {
+        console.log("Public key must contain only hex characters");
+        return false;
+    } else if (!address.startsWith("04")) {
+        console.log("Public key must start with 04");
+        return false;
+    }
+    return true;
+};
+
+const isValidTxInStructure = (txIn: TxIn): boolean => {
+    if (txIn == null) {
+        console.log("txIn is null");
+        return false;
+    } else if (typeof txIn.signature !== "string") {
+        console.log("invalid signature type in txIn");
+        return false;
+    } else if (typeof txIn.txOutId !== "string") {
+        console.log("invalid txOutId type in txIn");
+        return false;
+    } else if (typeof txIn.txOutIndex !== "number") {
+        console.log("invalid txOutIndex type in txIn");
+        return false;
+    }
+    return true;
+};
+
+const isValidTxOutStructure = (txOut: TxOut): boolean => {
+    if (txOut == null) {
+        console.log("txOut is null");
+        return false;
+    } else if (typeof txOut.address !== "string") {
+        console.log("invalid address type in txOut");
+        return false;
+    } else if (!isValidAddress(txOut.address)) {
+        console.log("invalid TxOut address");
+        return false;
+    } else if (typeof txOut.amount !== "number") {
+        console.log("invalid amount type in txOut");
+        return false;
+    }
+    return true;
+};
+
+const isValidTransactionStructure = (transaction: Transaction) => {
+    try {
+        if (typeof transaction.id !== "string") {
+            console.log("Invalid Transaction Id. This is not a string!!!");
+            return false;
+        }
+        if (!(transaction.txIns instanceof Array)) {
+            console.log("Invalid txIns type in transaction");
+            return false;
+        }
+        if (
+            !transaction.txIns
+                .map(isValidTxInStructure)
+                .reduce((a, b) => a && b, true)
+        ) {
+            return false;
+        }
+
+        if (!(transaction.txOuts instanceof Array)) {
+            console.log("invalid txIns type in transaction");
+            return false;
+        }
+
+        if (
+            !transaction.txOuts
+                .map(isValidTxOutStructure)
+                .reduce((a, b) => a && b, true)
+        ) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const validtateTransaction = (
+    transaction: Transaction,
+    unspentTxOuts: UnspentTxOut[]
+): boolean => {
+    if (!isValidTransactionStructure) {
+        return false;
+    }
+    if (TxFunctions.getTransactionId(transaction) !== transaction.id) {
+        console.log("Invalid txId");
+        return false;
+    }
+
+    return true;
+};
+
+export {
+    isValidBlockStructure,
+    isValidNewBlock,
+    toHexString,
+    isValidTransactionStructure,
+};

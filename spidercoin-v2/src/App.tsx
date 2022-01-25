@@ -1,23 +1,19 @@
 import React from "react";
-import logo from "./logo.svg";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import Blocks from "./components/Blocks/Blocks";
 
 function App() {
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>This is SpiderCoin v2!!</p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
-        </div>
+        <>
+            <div className="main-contents-container">
+                <Routes>
+                    <Route path="/">
+                        <Route index element={<Blocks />}></Route>
+                    </Route>
+                </Routes>
+            </div>
+        </>
     );
 }
 
