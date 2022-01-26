@@ -3,7 +3,7 @@ import ecdsa from "elliptic";
 import { TxOut } from "./txOut/txOut";
 import { TxIn } from "./txIn/txIn";
 import { UnspentTxOut } from "./unspentTxOut/unspentTxOut";
-import { toHexString } from "../../../utils/utils";
+import { toHexString, validateBlockTransactions } from "../../../utils/utils";
 
 const ec = new ecdsa.ec("secp256k1");
 
@@ -127,5 +127,31 @@ export class TxFunctions {
             .concat(newUnspentTxOuts);
 
         return resultingUnspentTxOuts;
+    };
+
+    static getTxInAmount = (
+        txIn: TxIn,
+        unspentTxOuts: UnspentTxOut[]
+    ): number => {
+        const txInAmount: number = this.findUnspentTxOut(
+            txIn.txOutId,
+            txIn.txOutIndex,
+            unspentTxOuts
+        ).amount;
+        return txInAmount;
+    };
+
+    static processTransactions = (
+        transactions: Transaction[],
+        unspentTxOuts: UnspentTxOut[],
+        blockIndex: number
+    ): UnspentTxOut[] | null => {
+        if (
+            !validateBlockTransactions(transactions, unspentTxOuts, blockIndex)
+        ) {
+            console.log("Invalid block Transactions");
+            return null;
+        }
+        return this.updateUnspentTxOuts(transactions, unspentTxOuts);
     };
 }
