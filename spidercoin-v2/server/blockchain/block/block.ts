@@ -44,7 +44,7 @@ export class Block {
             }
             throw new Error("Invalid BlockHeader");
         } catch (error) {
-            console.log(error);
+            throw error;
         }
     };
 
@@ -74,7 +74,7 @@ export class Block {
             const genesisBlock: Block = new Block(header, hash, transaction);
             return genesisBlock;
         } catch (error) {
-            console.log(error);
+            throw error;
         }
     };
 
@@ -101,7 +101,7 @@ export class Block {
                 merkleRoot = "0".repeat(64);
             }
 
-            let timestamp: number;
+            let timestamp: number = Date.now() / 1000;
             const difficulty: number = BlockHeader.adjustDifficulty(
                 lastBlock.header,
                 timestamp
@@ -127,7 +127,7 @@ export class Block {
             const newBlock: Block = new Block(blockHeader, hash, transaction);
             return newBlock;
         } catch (error) {
-            console.log(error);
+            throw error;
         }
     };
 }

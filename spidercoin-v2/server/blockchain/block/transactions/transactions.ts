@@ -54,13 +54,25 @@ export class TxFunctions {
         transactionId: string,
         index: number,
         fUnspentTxOuts: UnspentTxOut[]
-    ): UnspentTxOut | undefined => {
-        return fUnspentTxOuts.find(
+    ): UnspentTxOut => {
+        const findUTxO = fUnspentTxOuts.find(
             (uTxO) =>
                 uTxO.txOutId === transactionId && uTxO.txOutIndex === index
         );
+        if (findUTxO == undefined) {
+            throw new Error("can't find UTxO");
+        }
+        return findUTxO;
     };
 
+    /**
+     *
+     * @param transaction transaction
+     * @param txInIndex transaction input's index
+     * @param privateKey private key
+     * @param unSpentTxOuts unspent transaction outputs
+     * @returns TxIn's signature
+     */
     static signTxIn = (
         transaction: Transaction,
         txInIndex: number,
@@ -71,7 +83,11 @@ export class TxFunctions {
             const txIn: TxIn = transaction.txIns[txInIndex];
             const dataToSign: string = transaction.id;
             const referencedUnspentTxOut: UnspentTxOut | undefined =
-                this.findUnspentTxOut(transaction.id, txInIndex, unSpentTxOuts);
+                this.findUnspentTxOut(
+                    txIn.txOutId,
+                    txIn.txOutIndex,
+                    unSpentTxOuts
+                );
             if (referencedUnspentTxOut === undefined) {
                 throw new Error("Can't find transaction Id from UnspentTxOut");
             }
@@ -85,10 +101,16 @@ export class TxFunctions {
             const signature: string = toHexString(key.sign(dataToSign).toDER());
             return signature;
         } catch (error) {
-            console.log(error);
+            throw error;
         }
     };
 
+    /**
+     *
+     * @param transactions transaction [ ]
+     * @param unspentTxOuts unspent transaction output [ ]
+     * @returns updated unspent transaction output [ ]
+     */
     static updateUnspentTxOuts = (
         transactions: Transaction[],
         unspentTxOuts: UnspentTxOut[]
@@ -129,6 +151,12 @@ export class TxFunctions {
         return resultingUnspentTxOuts;
     };
 
+    /**
+     *
+     * @param txIn transaction input
+     * @param unspentTxOuts unspent transaction output [ ]
+     * @returns
+     */
     static getTxInAmount = (
         txIn: TxIn,
         unspentTxOuts: UnspentTxOut[]
@@ -154,4 +182,26 @@ export class TxFunctions {
         }
         return this.updateUnspentTxOuts(transactions, unspentTxOuts);
     };
+
+    /**
+     *
+     * @param address Address to receive reward for mining
+     * @param blockIndex block's index
+     * @returns a coinbase transaction
+     */
+    // static getCoinbaseTransaction = (
+    //     address: string,
+    //     blockIndex: number
+    // ): Transaction => {
+    //     const coinbaseTransaction = new Transaction();
+    //     let txIn: TxIn;
+    //     txIn.signature = "";
+    //     txIn.txOutId = "";
+    //     txIn.txOutIndex = blockIndex;
+
+    //     coinbaseTransaction.txIns = [txIn];
+    //     coinbaseTransaction.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
+    //     coinbaseTransaction.id = this.getTransactionId(coinbaseTransaction);
+    //     return coinbaseTransaction;
+    // };
 }

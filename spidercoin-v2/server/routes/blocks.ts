@@ -5,9 +5,8 @@ import * as config from "../config";
 const router: express.Router = express.Router();
 
 router.get("/", (req, res) => {
-    chain.addBlock([config.GENESIS_TRANSACTION]);
-    console.log(chain);
-    res.send("welcome block page");
+    res.send(chain);
 });
+router.get("/addblocks", (req, res) => {});
 
 export = router;

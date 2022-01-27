@@ -1,5 +1,5 @@
 import merkle from "merkle";
-import { Blockchain } from "../blockchain";
+import { Blockchain } from "../blockchain/blockchain";
 import { testCreateTxs } from "./testCreateTxFunc";
 import { isValidNewBlock } from "../../utils/utils";
 import { Block } from "../block/block";

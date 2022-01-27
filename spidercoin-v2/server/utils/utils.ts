@@ -211,26 +211,35 @@ const validateTxIn = (
     transaction: Transaction,
     unspentTxOuts: UnspentTxOut[]
 ): boolean => {
-    // 파라미터로 받은 txIn을 UTxO 중에서 찾는다.
-    const referencedUTxOut: UnspentTxOut = unspentTxOuts.find(
-        (uTxO) =>
-            uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex
-    );
-    // 찾은 UTxO값이 null이면 찾이 못했음.
-    if (referencedUTxOut == null) {
-        console.log("Referenced txOut not found");
+    try {
+        // 파라미터로 받은 txIn을 UTxO 중에서 찾는다.
+        const referencedUTxOut: UnspentTxOut | undefined = unspentTxOuts.find(
+            (uTxO) =>
+                uTxO.txOutId === txIn.txOutId &&
+                uTxO.txOutIndex === txIn.txOutIndex
+        );
+        // 찾은 UTxO값이 null이면 찾이 못했음.
+        if (referencedUTxOut == undefined) {
+            return false;
+            // throw new Error("Referenced txOut not found");
+        }
+        // 찾은 UTxO의 address의 key를 확인하고
+        const address: string = referencedUTxOut.address;
+        const key = ec.keyFromPublic(address, "hex");
+        // signature가 맞는지 확인한다.
+        const validSignature: boolean = key.verify(
+            transaction.id,
+            txIn.signature
+        );
+        if (!validSignature) {
+            console.log("Invalid TxIn signature");
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.log(error);
         return false;
     }
-    // 찾은 UTxO의 address의 key를 확인하고
-    const address: string = referencedUTxOut.address;
-    const key = ec.keyFromPublic(address, "hex");
-    // signature가 맞는지 확인한다.
-    const validSignature: boolean = key.verify(transaction.id, txIn.signature);
-    if (!validSignature) {
-        console.log("Invalid TxIn signature");
-        return false;
-    }
-    return true;
 };
 
 /**
