@@ -2,8 +2,9 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Blocks from "./components/blocks/Blocks";
-import Mempool from "./components/transaction/mempool/Mempool";
 import NavBar from "./components/navBar/NavBar";
+import Deposit from "./components/trade/deposit/Deposit";
+import Withdraw from "./components/trade/withdraw/Withdraw";
 import Signin from "./components/user/Signin";
 
 function App() {
@@ -16,9 +17,9 @@ function App() {
                         <Route index element={<Blocks />}></Route>
                         <Route path="blocks" element={<Blocks />} />
                         <Route path="wallet" element={<Blocks />} />
-                        <Route path="transaction">
-                            <Route path="mempool" element={<Mempool />} />
-                            <Route path="send" element={<Blocks />} />
+                        <Route path="trade">
+                            <Route path="deposit" element={<Deposit />} />
+                            <Route path="withdraw" element={<Withdraw />} />
                         </Route>
                         <Route path="user">
                             <Route path="signin" element={<Signin />} />

@@ -27,21 +27,18 @@ const NavBar = () => {
                                 Wallet
                             </Nav.Link>
                             <NavDropdown
-                                title="Transaction"
+                                title="Trade"
                                 id="navbarScrollingDropdown"
                                 menuVariant="dark"
                             >
-                                <NavDropdown.Item
-                                    as={Link}
-                                    to="/transaction/mempool"
-                                >
-                                    Mem Pool
+                                <NavDropdown.Item as={Link} to="/trade/deposit">
+                                    deposit
                                 </NavDropdown.Item>
                                 <NavDropdown.Item
                                     as={Link}
-                                    to="/transaction/send"
+                                    to="/trade/withdraw"
                                 >
-                                    send
+                                    withdraw
                                 </NavDropdown.Item>
                                 {/* <NavDropdown.Divider />
                                 <NavDropdown.Item as={Link} to="#action5">
@@ -49,6 +46,9 @@ const NavBar = () => {
                                 </NavDropdown.Item> */}
                             </NavDropdown>
                             <Nav>
+                                <Nav.Link as={Link} to="/mempool">
+                                    Mempool
+                                </Nav.Link>
                                 <Nav.Link as={Link} to="/user/signin">
                                     Sign in
                                 </Nav.Link>
