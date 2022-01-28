@@ -1,5 +1,3 @@
-import { Transaction } from "../transactions";
-
 export class UnspentTxOut {
     public readonly txOutId: string;
     public readonly txOutIndex: number;

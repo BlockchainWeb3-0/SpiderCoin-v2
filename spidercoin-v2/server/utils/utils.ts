@@ -93,7 +93,7 @@ const toHexString = (byteArray: number[]): string => {
 };
 
 ///////////////////////////////////////////////////////////////////////////
-// transaction 검사
+// ! transaction 검사
 
 /**
  * check length, regular expression, match
@@ -397,10 +397,46 @@ const validateBlockTransactions = (
         .reduce((a, b) => a && b, true);
 };
 
+///////////////////////////////////////////////////////////////////////////
+// ! Transaction Pools 검사
+
+const getTxPoolIns = (aTransactionPool: Transaction[]): TxIn[] => {
+    return _(aTransactionPool)
+        .map((tx) => tx.txIns)
+        .flatten()
+        .value();
+};
+
+const isValidTxForPool = (
+    tx: Transaction,
+    aTtransactionPool: Transaction[]
+): boolean => {
+    const txPoolIns: TxIn[] = getTxPoolIns(aTtransactionPool);
+
+    const containsTxIn = (txIns: TxIn[], txIn: TxIn) => {
+        return _.find(txPoolIns, (txPoolIn) => {
+            return (
+                txIn.txOutIndex === txPoolIn.txOutIndex &&
+                txIn.txOutId === txPoolIn.txOutId
+            );
+        });
+    };
+
+    for (const txIn of tx.txIns) {
+        if (containsTxIn(txPoolIns, txIn)) {
+            console.log("txIn already found in the txPool");
+            return false;
+        }
+    }
+    return true;
+};
+
 export {
     isValidBlockStructure,
     isValidNewBlock,
     toHexString,
     isValidTransactionStructure,
     validateBlockTransactions,
+    validateTransaction,
+    isValidTxForPool,
 };
