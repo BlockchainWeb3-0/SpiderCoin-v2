@@ -3,7 +3,11 @@ import ecdsa from "elliptic";
 import { TxOut } from "./txOut/txOut";
 import { TxIn } from "./txIn/txIn";
 import { UnspentTxOut } from "./unspentTxOut/unspentTxOut";
-import { toHexString, validateBlockTransactions } from "../../../utils/utils";
+
+import {
+    toHexString,
+    // validateBlockTransactions
+} from "../../../utils/utils";
 import { Block } from "../block";
 
 const ec = new ecdsa.ec("secp256k1");
@@ -175,12 +179,15 @@ export class TxFunctions {
         unspentTxOuts: UnspentTxOut[],
         blockIndex: number
     ): UnspentTxOut[] | null => {
-        if (
-            !validateBlockTransactions(transactions, unspentTxOuts, blockIndex)
-        ) {
-            console.log("Invalid block Transactions");
-            return null;
-        }
+        // const isValid = validateBlockTransactions(
+        //     transactions,
+        //     unspentTxOuts,
+        //     blockIndex
+        // );
+        // if (!isValid) {
+        //     console.log("Invalid block Transactions");
+        //     throw new Error("Invalid block Transactions");
+        // }
         return this.updateUnspentTxOuts(transactions, unspentTxOuts);
     };
 
@@ -207,10 +214,8 @@ export class TxFunctions {
     // };
 }
 
-export let unspentTxOuts = TxFunctions.processTransactions(
+export const unspentTxOuts = TxFunctions.processTransactions(
     Block.getGenesisBlock().transaction,
     [],
     0
 );
-
-console.log("이건 제네시스 utxo", unspentTxOuts);

@@ -8,10 +8,13 @@ import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
 import { TxOut } from "../blockchain/block/transactions/txOut/txOut";
 import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
 import * as ecdsa from "elliptic";
-import { COINBASE_AMOUNT } from "../config";
+import * as config from "../config";
 import _ from "lodash";
 
 const ec = new ecdsa.ec("secp256k1");
+
+const ab = [config.GENESIS_TRANSACTION];
+console.log("aabbbbbbccca", ab);
 
 /**
  *
@@ -284,7 +287,7 @@ const validateCoinbaseTx = (
         return false;
     }
     // 받은 Tx(coinbaseTx)의 TxOut의 amount가 config에 설정된 값이 아닐 시
-    if (transaction.txOuts[0].amount !== COINBASE_AMOUNT) {
+    if (transaction.txOuts[0].amount !== config.COINBASE_AMOUNT) {
         console.log("Invalid coinbase amount in coinbase transaction");
         return false;
     }
@@ -361,41 +364,44 @@ const hasDuplicates = (txIns: TxIn[]): boolean => {
         .includes(true);
 };
 
-/**
- *
- * @param transactions
- * @param unspentTxOuts
- * @param blockIndex
- * @returns
- */
-const validateBlockTransactions = (
-    transactions: Transaction[],
-    unspentTxOuts: UnspentTxOut[],
-    blockIndex: number
-): boolean => {
-    // 코인베이스 트랜잭션이 유효한가
-    const coinbaseTx = transactions[0];
-    if (!validateCoinbaseTx(coinbaseTx, blockIndex)) {
-        console.log("Invalid coinbase transaction");
-        return false;
-    }
+// /**
+//  *
+//  * @param transactions
+//  * @param unspentTxOuts
+//  * @param blockIndex
+//  * @returns
+//  */
+// const validateBlockTransactions = (
+//     transactions: Transaction[],
+//     unspentTxOuts: UnspentTxOut[],
+//     blockIndex: number
+// ): boolean => {
+//     // 코인베이스 트랜잭션이 유효한가
+//     const coinbaseTx = transactions[0];
+//     if (!validateCoinbaseTx(coinbaseTx, blockIndex)) {
+//         console.log("Invalid coinbase transaction");
+//         return false;
+//     }
 
-    // Tx[]에서 txIns들만 뽑아오기
-    const txIns: TxIn[] = _(transactions)
-        .map((tx) => tx.txIns)
-        .flatten()
-        .value();
-    // TxIns들 중에 중복이 있느냐! (이중 지불 방지)
-    if (hasDuplicates(txIns)) {
-        return false;
-    }
+//     // Tx[]에서 txIns들만 뽑아오기
+//     const txIns: TxIn[] = _(transactions)
+//         .map((tx) => tx.txIns)
+//         .flatten()
+//         .value();
+//     // TxIns들 중에 중복이 있느냐! (이중 지불 방지)
+//     if (hasDuplicates(txIns)) {
+//         return false;
+//     }
 
-    // coinbase Tx를 뺀 나머지 Tx들
-    const normalTransactions: Transaction[] = transactions.slice(1);
-    return normalTransactions
-        .map((tx) => validateTransaction(tx, unspentTxOuts))
-        .reduce((a, b) => a && b, true);
-};
+//     // coinbase Tx를 뺀 나머지 Tx들
+//     const normalTransactions: Transaction[] = transactions.slice(1);
+//     return normalTransactions
+//         .map((tx) => validateTransaction(tx, unspentTxOuts))
+//         .reduce((a, b) => a && b, true);
+// };
+
+// const isValid = validateBlockTransactions(ab, [], 0);
+// console.log(isValid);
 
 ///////////////////////////////////////////////////////////////////////////
 // ! Transaction Pools 검사
@@ -436,7 +442,7 @@ export {
     isValidNewBlock,
     toHexString,
     isValidTransactionStructure,
-    validateBlockTransactions,
+    // validateBlockTransactions,
     validateTransaction,
     isValidTxForPool,
 };

@@ -4,7 +4,7 @@ import {
     unspentTxOuts,
 } from "../blockchain/block/transactions/transactions";
 import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
-import { GENESIS_TRANSACTION, SECOND_TRANSACTION } from "../config";
+import { GENESIS_TRANSACTION } from "../config";
 import { isValidTxForPool, validateTransaction } from "../utils/utils";
 
 let transactionPool: Transaction[] = [];
@@ -21,8 +21,11 @@ class TransactionPool {
         tx: Transaction,
         unspentTxOuts: UnspentTxOut[] | null
     ) => {
+        if (unspentTxOuts === null) {
+            throw new Error("aaa");
+        }
         if (!validateTransaction(tx, unspentTxOuts)) {
-            throw Error("Trying to add invalid tx to pool");
+            throw new Error("Trying to add invalid tx to pool");
         }
 
         // if (!isValidTxForPool(tx, transactionPool)) {
@@ -34,5 +37,4 @@ class TransactionPool {
 }
 
 TransactionPool.addToTransactionPool(GENESIS_TRANSACTION, unspentTxOuts);
-TransactionPool.addToTransactionPool(SECOND_TRANSACTION, unspentTxOuts);
 console.log("Tx?", transactionPool[1]);
