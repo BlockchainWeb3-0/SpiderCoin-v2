@@ -1,9 +1,9 @@
 import merkle from "merkle";
 import { Blockchain } from "../blockchain/blockchain";
 import { testCreateTxs } from "./testCreateTxFunc";
-import { isValidNewBlock } from "../../utils/utils";
 import { Block } from "../block/block";
 import { Transaction } from "../block/transactions/transactions";
+import { isValidNewBlock } from "../../utils/blockValidate";
 
 describe("add block from genesis block test", () => {
     let tx1: Transaction[], chain: Block[], prevBlock: Block, newBlock: Block;

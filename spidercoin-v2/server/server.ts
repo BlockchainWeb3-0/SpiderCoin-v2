@@ -9,6 +9,7 @@ import index from "./routes";
 import user from "./routes/user";
 import blocks from "./routes/blocks";
 import transactions from "./routes/transactions";
+import { transactionPool } from "./transactionPool/transactionPool";
 
 const app = express();
 app.use(helmet());
@@ -18,6 +19,8 @@ app.disable("x-powered-by");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+console.log(transactionPool);
 
 const http_port: number = 3001;
 

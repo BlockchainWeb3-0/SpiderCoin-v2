@@ -5,9 +5,10 @@ import {
 } from "../blockchain/block/transactions/transactions";
 import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
 import { GENESIS_TRANSACTION } from "../config";
-import { isValidTxForPool, validateTransaction } from "../utils/utils";
+import { isValidTxForPool } from "../utils/txPoolValidate";
+import { validateTransaction } from "../utils/txValidate";
 
-let transactionPool: Transaction[] = [];
+export let transactionPool: Transaction[] = [];
 
 class TransactionPool {
     public transactionPool: Transaction[] = [];
@@ -21,6 +22,9 @@ class TransactionPool {
         tx: Transaction,
         unspentTxOuts: UnspentTxOut[] | null
     ) => {
+        console.log("addto에 들어온 tx : ", tx);
+        console.log("addto에 들어온 uTxO : ", unspentTxOuts);
+
         if (unspentTxOuts === null) {
             throw new Error("aaa");
         }
@@ -28,13 +32,12 @@ class TransactionPool {
             throw new Error("Trying to add invalid tx to pool");
         }
 
-        // if (!isValidTxForPool(tx, transactionPool)) {
-        //     throw Error("Trying to add invalid tx to pool");
-        // }
-        // console.log("adding to txPool: %s", JSON.stringify(tx));
+        if (!isValidTxForPool(tx, transactionPool)) {
+            throw Error("Trying to add invalid tx to pool");
+        }
+        console.log("adding to txPool: %s", JSON.stringify(tx));
         transactionPool.push(tx);
     };
 }
 
 TransactionPool.addToTransactionPool(GENESIS_TRANSACTION, unspentTxOuts);
-console.log("Tx?", transactionPool[1]);

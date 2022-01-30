@@ -1,4 +1,4 @@
-import { isValidNewBlock } from "../../utils/utils";
+import { isValidNewBlock } from "../../utils/blockValidate";
 import { Block } from "../block/block";
 import { Transaction } from "../block/transactions/transactions";
 

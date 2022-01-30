@@ -4,10 +4,7 @@ import { TxOut } from "./txOut/txOut";
 import { TxIn } from "./txIn/txIn";
 import { UnspentTxOut } from "./unspentTxOut/unspentTxOut";
 
-import {
-    toHexString,
-    // validateBlockTransactions
-} from "../../../utils/utils";
+import { toHexString } from "../../../utils/utils";
 import { Block } from "../block";
 
 const ec = new ecdsa.ec("secp256k1");
