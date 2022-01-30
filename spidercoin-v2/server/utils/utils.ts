@@ -364,44 +364,44 @@ const hasDuplicates = (txIns: TxIn[]): boolean => {
         .includes(true);
 };
 
-// /**
-//  *
-//  * @param transactions
-//  * @param unspentTxOuts
-//  * @param blockIndex
-//  * @returns
-//  */
-// const validateBlockTransactions = (
-//     transactions: Transaction[],
-//     unspentTxOuts: UnspentTxOut[],
-//     blockIndex: number
-// ): boolean => {
-//     // 코인베이스 트랜잭션이 유효한가
-//     const coinbaseTx = transactions[0];
-//     if (!validateCoinbaseTx(coinbaseTx, blockIndex)) {
-//         console.log("Invalid coinbase transaction");
-//         return false;
-//     }
+/**
+ *
+ * @param transactions
+ * @param unspentTxOuts
+ * @param blockIndex
+ * @returns
+ */
+const validateBlockTransactions = (
+    transactions: Transaction[],
+    unspentTxOuts: UnspentTxOut[],
+    blockIndex: number
+): boolean => {
+    // 코인베이스 트랜잭션이 유효한가
+    const coinbaseTx = transactions[0];
+    if (!validateCoinbaseTx(coinbaseTx, blockIndex)) {
+        console.log("Invalid coinbase transaction");
+        return false;
+    }
 
-//     // Tx[]에서 txIns들만 뽑아오기
-//     const txIns: TxIn[] = _(transactions)
-//         .map((tx) => tx.txIns)
-//         .flatten()
-//         .value();
-//     // TxIns들 중에 중복이 있느냐! (이중 지불 방지)
-//     if (hasDuplicates(txIns)) {
-//         return false;
-//     }
+    // Tx[]에서 txIns들만 뽑아오기
+    const txIns: TxIn[] = _(transactions)
+        .map((tx) => tx.txIns)
+        .flatten()
+        .value();
+    // TxIns들 중에 중복이 있느냐! (이중 지불 방지)
+    if (hasDuplicates(txIns)) {
+        return false;
+    }
 
-//     // coinbase Tx를 뺀 나머지 Tx들
-//     const normalTransactions: Transaction[] = transactions.slice(1);
-//     return normalTransactions
-//         .map((tx) => validateTransaction(tx, unspentTxOuts))
-//         .reduce((a, b) => a && b, true);
-// };
+    // coinbase Tx를 뺀 나머지 Tx들
+    const normalTransactions: Transaction[] = transactions.slice(1);
+    return normalTransactions
+        .map((tx) => validateTransaction(tx, unspentTxOuts))
+        .reduce((a, b) => a && b, true);
+};
 
-// const isValid = validateBlockTransactions(ab, [], 0);
-// console.log(isValid);
+const isValid = validateBlockTransactions(ab, [], 0);
+console.log("이거 뭐야 되는거임?", isValid);
 
 ///////////////////////////////////////////////////////////////////////////
 // ! Transaction Pools 검사
