@@ -6,6 +6,7 @@ import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
 import * as ecdsa from "elliptic";
 import * as config from "../config";
 import _ from "lodash";
+import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
 
 const ec = new ecdsa.ec("secp256k1");
 
@@ -111,4 +112,19 @@ const getTxPoolIns = (aTransactionPool: Transaction[]): TxIn[] => {
         .value();
 };
 
-export { toHexString, getTxPoolIns, hasDuplicates, validateCoinbaseTx };
+const hasTxIn = (txIn: TxIn, unspentTxOuts: UnspentTxOut[]): boolean => {
+    const foundTxIn = unspentTxOuts.find((uTxO: UnspentTxOut) => {
+        return (
+            uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex
+        );
+    });
+    return foundTxIn !== undefined;
+};
+
+export {
+    toHexString,
+    getTxPoolIns,
+    hasDuplicates,
+    validateCoinbaseTx,
+    hasTxIn,
+};

@@ -4,8 +4,9 @@ import { TxOut } from "./txOut/txOut";
 import { TxIn } from "./txIn/txIn";
 import { UnspentTxOut } from "./unspentTxOut/unspentTxOut";
 
-import { toHexString } from "../../../utils/utils";
+import { hasTxIn, toHexString } from "../../../utils/utils";
 import { Block } from "../block";
+import { validateBlockTransactions } from "../../../utils/txValidate";
 
 const ec = new ecdsa.ec("secp256k1");
 
@@ -176,15 +177,15 @@ export class TxFunctions {
         unspentTxOuts: UnspentTxOut[],
         blockIndex: number
     ): UnspentTxOut[] | null => {
-        // const isValid = validateBlockTransactions(
-        //     transactions,
-        //     unspentTxOuts,
-        //     blockIndex
-        // );
-        // if (!isValid) {
-        //     console.log("Invalid block Transactions");
-        //     throw new Error("Invalid block Transactions");
-        // }
+        const isValid = validateBlockTransactions(
+            transactions,
+            unspentTxOuts,
+            blockIndex
+        );
+        if (!isValid) {
+            console.log("Invalid block Transactions");
+            throw new Error("Invalid block Transactions");
+        }
         return this.updateUnspentTxOuts(transactions, unspentTxOuts);
     };
 
@@ -194,21 +195,21 @@ export class TxFunctions {
      * @param blockIndex block's index
      * @returns a coinbase transaction
      */
-    // static getCoinbaseTransaction = (
-    //     address: string,
-    //     blockIndex: number
-    // ): Transaction => {
-    //     const coinbaseTransaction = new Transaction();
-    //     let txIn: TxIn;
-    //     txIn.signature = "";
-    //     txIn.txOutId = "";
-    //     txIn.txOutIndex = blockIndex;
+    static getCoinbaseTransaction = (
+        address: string,
+        blockIndex: number
+    ): Transaction => {
+        const coinbaseTransaction = new Transaction();
+        let txIn: TxIn = new TxIn();
+        txIn.signature = "";
+        txIn.txOutId = "";
+        txIn.txOutIndex = blockIndex;
 
-    //     coinbaseTransaction.txIns = [txIn];
-    //     coinbaseTransaction.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
-    //     coinbaseTransaction.id = this.getTransactionId(coinbaseTransaction);
-    //     return coinbaseTransaction;
-    // };
+        coinbaseTransaction.txIns = [txIn];
+        coinbaseTransaction.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
+        coinbaseTransaction.id = this.getTransactionId(coinbaseTransaction);
+        return coinbaseTransaction;
+    };
 }
 
 export const unspentTxOuts = TxFunctions.processTransactions(

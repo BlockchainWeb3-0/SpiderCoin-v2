@@ -5,11 +5,11 @@ import _ from "lodash";
 
 const isValidTxForPool = (
     tx: Transaction,
-    aTtransactionPool: Transaction[]
+    transactionPool: Transaction[]
 ): boolean => {
-    const txPoolIns: TxIn[] = getTxPoolIns(aTtransactionPool);
+    const txPoolIns: TxIn[] = getTxPoolIns(transactionPool);
 
-    const containsTxIn = (txIns: TxIn[], txIn: TxIn) => {
+    const containsTxIn = (txPoolIns: TxIn[], txIn: TxIn) => {
         return _.find(txPoolIns, (txPoolIn) => {
             return (
                 txIn.txOutIndex === txPoolIn.txOutIndex &&
