@@ -3,14 +3,14 @@ import { getTxPoolIns } from "./utils";
 import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
 import _ from "lodash";
 
-const isValidTxForPool = (
+export const isValidTxForPool = (
     tx: Transaction,
-    transactionPool: Transaction[]
+    aTransactionPool: Transaction[]
 ): boolean => {
-    const txPoolIns: TxIn[] = getTxPoolIns(transactionPool);
+    const txPoolIns: TxIn[] = getTxPoolIns(aTransactionPool);
 
-    const containsTxIn = (txPoolIns: TxIn[], txIn: TxIn) => {
-        return _.find(txPoolIns, (txPoolIn) => {
+    const containsTxIn = (aTxPoolIns: TxIn[], txIn: TxIn) => {
+        return _.find(aTxPoolIns, (txPoolIn) => {
             return (
                 txIn.txOutIndex === txPoolIn.txOutIndex &&
                 txIn.txOutId === txPoolIn.txOutId
@@ -26,5 +26,3 @@ const isValidTxForPool = (
     }
     return true;
 };
-
-export { isValidTxForPool };

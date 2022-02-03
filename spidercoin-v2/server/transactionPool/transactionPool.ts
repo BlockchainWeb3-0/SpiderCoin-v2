@@ -2,9 +2,8 @@ import _ from "lodash";
 import { Transaction } from "../blockchain/block/transactions/transactions";
 import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
 import { isValidTxForPool } from "../utils/txPoolValidate";
-import { validateTransaction } from "../utils/txValidate";
-import { hasTxIn } from "../utils/utils";
-
+import { validateTransaction } from "../utils/utilFunction";
+import { hasTxIn } from "../utils/utilFunction";
 export let transactionPool: Transaction[] = [];
 
 export class TransactionPool {

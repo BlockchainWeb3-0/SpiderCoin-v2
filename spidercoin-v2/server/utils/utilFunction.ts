@@ -1,15 +1,100 @@
-import {
-    Transaction,
-    TxFunctions,
-} from "../blockchain/block/transactions/transactions";
-import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
-import { TxOut } from "../blockchain/block/transactions/txOut/txOut";
+import { Transaction } from "../blockchain/block/transactions/transactions";
 import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
+import { TxIn } from "../blockchain/block/transactions/txIn/txIn";
+import { TxFunctions } from "../blockchain/block/transactions/transactions";
+import * as config from "../config";
 
+import { TxOut } from "../blockchain/block/transactions/txOut/txOut";
 import * as ecdsa from "elliptic";
-import { hasDuplicates, isValidateCoinbaseTx } from "./utils/utilFunction";
 import _ from "lodash";
 const ec = new ecdsa.ec("secp256k1");
+
+/**
+ * 한자리 수도 두자리로 나타내기 위해 "0"을 더함.
+ * 두자리 수는 0을 더해서 세자리가 되므로 slice로 마지막 두 숫자만 반환
+ * @param byteArray
+ * @returns Hex data -> String data
+ */
+export const toHexString = (byteArray: number[]): string => {
+    return Array.from(byteArray, (byte: any) =>
+        ("0" + (byte & 0xff).toString(16)).slice(-2)
+    ).join("");
+};
+
+/**
+ * check match, value,
+ * @param transaction transaction
+ * @param blockIndex block's index
+ * @returns valid coinbase transaction -> true / not valid coinbase transaction -> false
+ */
+export const isValidateCoinbaseTx = (
+    aTransaction: Transaction,
+    blockIndex: number
+): boolean => {
+    // 받은 Tx(coinbaseTx)가 null 일 시
+    if (aTransaction == null) {
+        console.log(
+            "The first transaction in the block must be coinbase transaction"
+        );
+        return false;
+    }
+    // 받은 Tx(coinbaseTx)의 id를 계산한 값과 받은 Tx의 현재 id가 같은지
+    if (TxFunctions.getTransactionId(aTransaction) !== aTransaction.id) {
+        console.log("Invalid coinbase tx Id");
+        return false;
+    }
+    // 받은 Tx(coinbaseTx)의 TxIn의 갯수가 1개가 아닐 시 (coinbase의 TxIn은 1개 밖에 없다.)
+    if (aTransaction.txIns.length !== 1) {
+        console.log(
+            "Only one txIn must be specified in the coinbase transaction"
+        );
+        return false;
+    }
+    // 받은 Tx(coinbaseTx)의 TxIn index가 받은 blockIndex가 아닐 시
+    if (aTransaction.txIns[0].txOutIndex !== blockIndex) {
+        console.log(
+            "The txIn signature in coinbase tx must be the block height"
+        );
+        return false;
+    }
+    // 받은 Tx(coinbaseTx)의 TxOut의 갯수가 1개가 아닐 시 (coinbase의 TxOut은 1개 밖에 없다.)
+    if (aTransaction.txOuts.length !== 1) {
+        console.log("Invalid number of txOuts in coinbase transaction");
+        return false;
+    }
+    // 받은 Tx(coinbaseTx)의 TxOut의 amount가 config에 설정된 값이 아닐 시
+    if (aTransaction.txOuts[0].amount !== config.COINBASE_AMOUNT) {
+        console.log("Invalid coinbase amount in coinbase transaction");
+        return false;
+    }
+    return true;
+};
+
+/**
+ *
+ * @param txIns transaction inputs
+ * @returns value > 1 -> it's duplicate!!!!!! -> true
+ */
+export const hasDuplicates = (txIns: TxIn[]): boolean => {
+    /**
+     * ex ) { '1':[txOutId+txOutIndex], ... }
+     * @returns - { value : key }
+     */
+    const groups = _.countBy(
+        txIns,
+        (txIn: TxIn) => txIn.txOutId + txIn.txOutIndex
+    );
+    return _(groups)
+        .map((value, key) => {
+            if (value > 1) {
+                console.log("duplicate txIn");
+                return true;
+            } else {
+                return false;
+            }
+        })
+        .includes(true);
+};
 
 /**
  * check isNull, type
@@ -165,7 +250,7 @@ const validateTxIn = (
  * @param unspentTxOuts unspent transaction outs
  * @returns valid transaction -> true / not valid transaction -> false
  */
-const validateTransaction = (
+export const validateTransaction = (
     transaction: Transaction,
     unspentTxOuts: UnspentTxOut[]
 ): boolean => {
@@ -215,25 +300,17 @@ const validateTransaction = (
  * @returns
  */
 
-const validateBlockTransactions = (
+export const validateBlockTransactions = (
     aTransactions: Transaction[],
     aUnspentTxOuts: UnspentTxOut[],
     blockIndex: number
 ): boolean => {
     // 코인베이스 트랜잭션이 유효한가
     const coinbaseTx: Transaction = aTransactions[0];
-    console.log("coinbase Tx", coinbaseTx);
-    console.log("blockIndex", blockIndex);
-    isValidateCoinbaseTx(coinbaseTx, blockIndex);
-    // console.log(
-    //     "이게 함수가 아니야?",
-    //     utils.isValidateCoinbaseTx(coinbaseTx, blockIndex)
-    // );
-
-    // if (!utils.isValidateCoinbaseTx(coinbaseTx, blockIndex)) {
-    //     console.log("Invalid coinbase transaction");
-    //     return false;
-    // }
+    if (!isValidateCoinbaseTx(coinbaseTx, blockIndex)) {
+        console.log("Invalid coinbase transaction");
+        return false;
+    }
 
     // Tx[]에서 txIns들만 뽑아오기
     const txIns: TxIn[] = _(aTransactions)
@@ -252,4 +329,45 @@ const validateBlockTransactions = (
         .reduce((a, b) => a && b, true);
 };
 
-export { validateTransaction, validateBlockTransactions };
+///////////////////////////////////////////////////////////////////////////
+// ! Transaction Pools 검사
+
+export const getTxPoolIns = (aTransactionPool: Transaction[]): TxIn[] => {
+    return _(aTransactionPool)
+        .map((tx) => tx.txIns)
+        .flatten()
+        .value();
+};
+
+export const hasTxIn = (txIn: TxIn, unspentTxOuts: UnspentTxOut[]): boolean => {
+    const foundTxIn = unspentTxOuts.find((uTxO: UnspentTxOut) => {
+        return (
+            uTxO.txOutId === txIn.txOutId && uTxO.txOutIndex === txIn.txOutIndex
+        );
+    });
+    return foundTxIn !== undefined;
+};
+
+export const isValidTxForPool = (
+    tx: Transaction,
+    aTransactionPool: Transaction[]
+): boolean => {
+    const txPoolIns: TxIn[] = getTxPoolIns(aTransactionPool);
+
+    const containsTxIn = (aTxPoolIns: TxIn[], txIn: TxIn) => {
+        return _.find(aTxPoolIns, (txPoolIn) => {
+            return (
+                txIn.txOutIndex === txPoolIn.txOutIndex &&
+                txIn.txOutId === txPoolIn.txOutId
+            );
+        });
+    };
+
+    for (const txIn of tx.txIns) {
+        if (containsTxIn(txPoolIns, txIn)) {
+            console.log("txIn already found in the txPool");
+            return false;
+        }
+    }
+    return true;
+};

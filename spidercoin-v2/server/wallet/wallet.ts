@@ -1,5 +1,7 @@
 import { ec } from "elliptic";
 import fs from "fs";
+import _ from "lodash";
+import { UnspentTxOut } from "../blockchain/block/transactions/unspentTxOut/unspentTxOut";
 
 const EC: ec = new ec("secp256k1");
 const privateKeyLocation: string =
@@ -33,6 +35,14 @@ const initWallet = () => {
         "new wallet with private key created to : %s",
         privateKeyLocation
     );
+};
+
+const getBalance = (address: string, unspentTxOuts: UnspentTxOut[]): number => {
+    const balance = _(unspentTxOuts)
+        .filter((uTxO: UnspentTxOut) => uTxO.address === address)
+        .map((uTxO: UnspentTxOut) => uTxO.amount)
+        .sum();
+    return balance;
 };
 
 initWallet();
