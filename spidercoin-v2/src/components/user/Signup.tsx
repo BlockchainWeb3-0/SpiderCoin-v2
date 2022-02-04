@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 // import PopupMsg from "../alert/PopupMsg";
 import { useNavigate } from "react-router-dom";
 
-export default function Signup() {
+export default function Signup({}) {
     let navigate = useNavigate();
     const [inputInfo, setInputInfo] = useState({
         email: "",
-        passwordRepeat: "",
         password: "",
+        passwordRepeat: "",
     });
     const [signinResult, setSigninResult] = useState({
         type: "info",
