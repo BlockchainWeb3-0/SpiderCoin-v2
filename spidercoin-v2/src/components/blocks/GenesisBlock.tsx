@@ -1,5 +1,5 @@
 import React from "react";
-// import "./GenesisBlock.scss";
+import "./GenesisBlock.scss";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 
@@ -23,7 +23,7 @@ const GenesisBlock = (blockInfo: any) => {
     return (
         <>
             <div className="genesisBlock" onClick={handleOpen}>
-                {blockInfo.header.index}
+                {blockInfo.blockInfo.header.index}
                 <div>
                     <div></div>
                     <div></div>
@@ -36,25 +36,28 @@ const GenesisBlock = (blockInfo: any) => {
             <Modal open={open} onClose={handleClose}>
                 <Box sx={style}>
                     <div>
-                        <b>index</b> : {blockInfo.header.index}
+                        <b>index</b> : {blockInfo.blockInfo.header.index}
                     </div>
                     <div>
-                        <b>prevHash</b> : {blockInfo.header.prevHash}
+                        <b>prevHash</b> : {blockInfo.blockInfo.header.prevHash}
                     </div>
                     <div>
-                        <b>merkleRoot</b> : {blockInfo.header.merkleRoot}
+                        <b>merkleRoot</b> :{" "}
+                        {blockInfo.blockInfo.header.merkleRoot}
                     </div>
                     <div>
-                        <b>timestamp</b> : {blockInfo.header.timestamp}
+                        <b>timestamp</b> :{" "}
+                        {blockInfo.blockInfo.header.timestamp}
                     </div>
                     <div>
-                        <b>hash</b> : {blockInfo.hash}
+                        <b>hash</b> : {blockInfo.blockInfo.hash}
                     </div>
                     <div>
-                        <b>difficulty</b> : {blockInfo.header.difficulty}
+                        <b>difficulty</b> :{" "}
+                        {blockInfo.blockInfo.header.difficulty}
                     </div>
                     <div>
-                        <b>nonce</b> : {blockInfo.header.nonce}
+                        <b>nonce</b> : {blockInfo.blockInfo.header.nonce}
                     </div>
                 </Box>
             </Modal>

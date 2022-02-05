@@ -1,29 +1,23 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
-// import "./Blocks.scss";
+import useAxios from "../../hooks/useAxios";
+import "./Blocks.scss";
 import Cube from "./Cube";
 import GenesisBlock from "./GenesisBlock";
 
 const Blocks = () => {
     const [test, setTest] = useState({});
 
-    const [blocks, setBlocks] = useState({
-        data: [{ hash: "" }],
-        loading: false,
+    const blocks = useAxios({
+        method: "get",
+        baseURL: "http://localhost:3001",
+        url: "/blocks",
     });
 
-    axios
-        .get("http://localhost:3001/blocks")
-        .then((res) => setBlocks({ ...blocks, data: [{ hash: "1" }] }))
-        .then((res) => {
-            console.log(blocks);
-            return true;
-        });
-
-    const txDataList = [{ tx: "test" }];
-    useEffect(() => {}, [blocks.data]);
-    console.log(test);
+    useEffect(() => {
+        setTest(blocks.data);
+    }, [blocks.data]);
 
     if (blocks.loading) {
         return (
@@ -32,20 +26,16 @@ const Blocks = () => {
             </>
         );
     } else {
-        console.log(blocks);
-        const genesisBlock = blocks.data[0];
-        const restBlocks = blocks.data.slice(1);
+        console.log("blocks", blocks.data.chain[0]);
+        const genesisBlock = blocks.data.chain[0];
+        const restBlocks = blocks.data.chain.slice(1);
         return (
             <>
                 <div className="blocks-container">
                     <div className="blockchain">
                         <GenesisBlock blockInfo={genesisBlock} />
                         {restBlocks.map((block, index) => (
-                            <Cube
-                                key={block.hash}
-                                blockInfo={block}
-                                txData={txDataList}
-                            />
+                            <Cube key={block.hash} blockInfo={block} />
                         ))}
                     </div>
                 </div>
