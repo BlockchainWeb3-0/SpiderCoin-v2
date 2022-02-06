@@ -19,9 +19,9 @@ export const GENESIS_TRANSACTION: Transaction = {
     txOuts: [
         {
             address:
-                "04875a5ee53110a1ce856f2fc549671456afcc62a510d96cb8e05ca0cb65f78c0b1fb880db8ac195cee93d2d6eff917e795f224d63a2c73319b1ce1e42f27395a4",
+                "04cf239f05062e36972d490aa3253ac6f654e972b7499c1ea9c607098601dbe5671de1655623e9e13627631b3dcc968d27189225b1a6e82c9d8017e4d83ea4c202",
             amount: 50,
         },
     ],
-    id: "ff21efb83712a97c5bab8babbf5e7e6b3af9fce90aae1fcf5dbe45e753e594ba",
+    id: "625d384d04f3f988494c791c2d06c78963ba29e0b9854588de62a53709519b25",
 };

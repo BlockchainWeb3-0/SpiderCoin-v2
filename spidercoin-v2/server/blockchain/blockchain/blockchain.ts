@@ -1,6 +1,9 @@
+import { TransactionPool } from "../../transactionPool/transactionPool";
 import { isValidNewBlock } from "../../utils/blockValidate";
+import { createTransaction } from "../../wallet/wallet";
 import { Block } from "../block/block";
-import { Transaction } from "../block/transactions/transactions";
+import { Transaction, TxFunctions } from "../block/transactions/transactions";
+import { UnspentTxOut } from "../block/transactions/unspentTxOut/unspentTxOut";
 
 export class Blockchain {
     public chain: Block[];
@@ -36,4 +39,37 @@ export class Blockchain {
         }
         return newBlock;
     }
+    sendTransaction = (
+        address: string,
+        amount: number,
+        privateKey: string,
+        unspentTxOuts: UnspentTxOut[],
+        transactionPool: Transaction[],
+        myAddress: string
+    ): Transaction => {
+        const tx: Transaction = createTransaction(
+            address,
+            amount,
+            privateKey,
+            unspentTxOuts,
+            transactionPool,
+            myAddress
+        );
+        TransactionPool.addToTransactionPool(tx, unspentTxOuts);
+        return tx;
+    };
+
+    getBlockData = (
+        txOutAddress: string,
+        blockchain: Blockchain,
+        transactionPool: Transaction[]
+    ) => {
+        const coinbaseTx: Transaction = TxFunctions.getCoinbaseTransaction(
+            txOutAddress,
+            blockchain.getLastBlock().header.index + 1
+        );
+        const transactions: Transaction[] = transactionPool;
+        const blockData: Transaction[] = [coinbaseTx].concat(transactions);
+        return blockData;
+    };
 }

@@ -17,6 +17,7 @@ router.post("/addtransaction", (req, res) => {
             amount: number;
         }
         const { TxInAddress, TxOutAddress, sign, amount }: TxData = req.body;
+
         if (
             TxInAddress === undefined ||
             TxOutAddress == undefined ||
@@ -33,10 +34,11 @@ router.post("/addtransaction", (req, res) => {
             // );
         }
         if (unspentTxOuts === null) {
+            console.log(TxInAddress, TxOutAddress, sign, amount);
             res.status(404).send("Invalid unspentTxOuts");
             throw Error("Invalid unspentTxOuts");
         } else {
-            const newTransaciton = chain.(
+            const newTransaciton = chain.sendTransaction(
                 TxOutAddress,
                 amount,
                 sign,
@@ -44,9 +46,16 @@ router.post("/addtransaction", (req, res) => {
                 transactionPool,
                 TxInAddress
             );
+
             res.send({ newTransaciton, message: "success" });
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+router.get("/txpool", (req, res) => {
+    res.send(transactionPool);
 });
 
 export = router;
