@@ -263,10 +263,7 @@ export const validateTransaction = (
         console.log("Invalid txId");
         return false;
     }
-    console.log("/////////////////////////////////////////");
-    console.log(TxFunctions.getTransactionId(transaction));
-    console.log(transaction);
-    console.log("/////////////////////////////////////////");
+
     // 받은 Tx의 TxIn들을 하나하나 확인해서 유효한 TxIn들인지 확인
     const hasValidTxIns: boolean = transaction.txIns
         .map((txIn) => validateTxIn(txIn, transaction, unspentTxOuts))

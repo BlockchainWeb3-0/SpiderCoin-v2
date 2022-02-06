@@ -7,9 +7,9 @@ import { Post } from "../../../api/api";
 
 const Withdraw = () => {
     const [postData, setPostData] = useState({
-        myAddress: "",
-        address: "",
-        privateKey: "",
+        TxInAddress: "",
+        TxOutAddress: "",
+        sign: "",
         amount: 0,
     });
 
@@ -22,25 +22,26 @@ const Withdraw = () => {
 
     const addTx = async () => {
         const result = await axios.request(params);
+        console.log(result);
     };
 
     // TODO: 내 로그인 정보에서 가져올 것임
     const textOnMyAddresss = (e: any) => {
         const myAddr: string = e.target.value;
-        setPostData({ ...postData, myAddress: myAddr });
+        setPostData({ ...postData, TxInAddress: myAddr });
     };
 
     const textOnAddresss = (e: any) => {
         const addr: string = e.target.value;
-        setPostData({ ...postData, address: addr });
-    };
-    const textOnPrivateKey = (e: any) => {
-        const privateKey: string = e.target.value;
-        setPostData({ ...postData, privateKey: privateKey });
+        setPostData({ ...postData, TxOutAddress: addr });
     };
     const textOnAmount = (e: any) => {
         const amount: number = parseInt(e.target.value);
         setPostData({ ...postData, amount: amount });
+    };
+    const textOnPrivateKey = (e: any) => {
+        const privateKey: string = e.target.value;
+        setPostData({ ...postData, sign: privateKey });
     };
 
     return (
